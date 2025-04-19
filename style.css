@@ -1,0 +1,146 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    min-height: 100vh;
+    font-family:sans-serif
+}
+
+nav{
+    background-color: forestgreen;
+    box-shadow: 3px 3px 5px rgba(0 ,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+nav ul{
+    width: 100%;
+    list-style: none;
+    display:flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+nav li{
+    height: 10vh;
+}
+nav a{
+    height: 100%;
+    padding: 0 30px;
+    
+    text-decoration: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+nav a:hover{
+    background-color: green;
+}
+
+.sidebar{
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 20vw;
+    background-color: rgb(40, 161, 40);
+    box-shadow: -10px 0 10px rgba(0,0,0,0.1);
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+.sidebar li{
+    width: 200;
+}#nav_icon{
+    color: white;
+    padding: 27px;
+}
+#close_icon{
+    color: white;
+    padding: 27px;
+}
+#nav_icon:hover{
+    background-color: green;
+}
+
+h1{
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 2.25vw;
+    font-style: oblique;
+}
+span{
+    color: forestgreen;
+}
+
+.intro{
+    height: 50vh;
+    width: 50vw;
+    /* background-color: gray; */
+    font-weight: 200;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    overflow: hidden;
+    font-weight: 600;
+    font-size: 1.5vw;
+    min-width: 50%;
+}
+.statement{
+    margin-top: 1.23rem;
+    width: 100%;
+}
+.bullet_point{
+    margin-left: 1rem;
+    margin-top: 2rem;
+}
+.example{
+    /* background-color: gold; */
+    font-weight: 600;
+    font-size: 1.5vw;
+}
+.example p{
+    margin-top: 1.35rem;
+}
+main{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+.matter{
+    height: 50vh;
+    background-color: yellowgreen;
+    width: 50vw;
+}
+.Matter_heading{
+    font-weight: 800;
+}
+@media (min-width:801px){
+    #nav_icon{
+        display: none;
+    }
+}
+
+@media (max-width:800px) {
+    .hideonmobile{
+        display: none;
+    }
+    
+}
+
+@media (max-width:700px) {
+    .sidebar{
+        width: 50%;
+    }
+    
+}
+
+@media (max-width:400px) {
+    .sidebar{
+        width: 100%;
+    }
+    
+}

@@ -1,7 +1,15 @@
 {
-    "name":"socket-chat-example",
+    "name": "socket-chat-example",
     "version": "0.0.1",
-    "description": "my first socket file i hope it will help you",
+    "description": "My first socket file, I hope it will help you",
+    "main": "server.js",
     "type": "commonjs",
-    "dependencies": {}
-}
+    "scripts": {
+      "start": "node server.js"
+    },
+    "dependencies": {
+      "express": "^4.18.2",
+      "ws": "^8.13.0"
+    }
+  }
+  

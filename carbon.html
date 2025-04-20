@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🌍 My Carbon Tracker</title>
+  <link rel="stylesheet" href="carbon.css">
+  <script src="https://kit.fontawesome.com/bcb0827a72.js" crossorigin="anonymous"></script>
+
+  <style>
+  
+    
+    label, select, input, button { display: block; margin: 10px 0; }
+    .activity { padding: 10px; border: 1px solid #171010; margin-bottom: 10px; border-radius: 8px; }
+    button { padding: 8px 12px; font-size: 16px; }
+
+  </style>
+</head>
+<body>
+  <nav>
+    <ul>
+        <li class="hideonmobile"><a href="index.html">HOME</a></li>
+        <li class="hideonmobile"><a href="humanindex.html">CHAT</a></li>
+        <li class="hideonmobile"><a href="carbon.html">FOOTPRINT</a></li>
+        <li class="hideonmobile"><a href="aichat.html">AI CHAT</a> </li>
+        <li class="hideonmobile"><a href="">CONTACT US</a></li>
+        <li ><i class="fa-solid fa-bars" id="nav_icon"></i></li>
+
+    </ul>
+    <ul  class="sidebar">
+        <li><i class="fa-solid fa-xmark" id="close_icon"></i></li>
+        <li><a href="index.html">HOME</a></li>
+        <li><a href="humanindex.html">CHAT</a></li>
+        <li><a href="carbon.html">FOOTPRINT</a></li>
+        <li><a href="aichat.html">AI CHAT</a> </li>
+        <li><a href="">CONTACT US</a></li>
+        
+
+    </ul>
+</nav>
+<div class="all_activities">
+  <h2>🌱 Daily Carbon Tracker</h2>
+  <div id="activities">
+    <div class="activity">
+      <select class="activity-type">
+        <option value="car">Car (₹ spent)</option>
+        <option value="electricity">Electricity (kWh)</option>
+        <option value="flight">Flight (km)</option>
+        <option value="lpg">LPG (Meals cooked)</option>
+      </select>
+      <input type="number" class="activity-value" placeholder="Enter value" />
+    </div>
+  </div>
+
+  <button onclick="addActivity()">➕ Add More</button>
+  <button onclick="calculateTotalEmission()">✅ Calculate Total Emissions</button>
+
+  <div id="result" style="margin-top:20px; font-weight: bold;"></div>
+  <div id="tip" style="margin-top:10px; color: green;"></div>
+</div>
+  
+
+  <script>
+    function addActivity() {
+      const container = document.getElementById("activities");
+
+      const newDiv = document.createElement("div");
+      newDiv.className = "activity";
+      newDiv.innerHTML = `
+        <select class="activity-type">
+          <option value="car">Car (₹ spent)</option>
+          <option value="electricity">Electricity (kWh)</option>
+          <option value="flight">Flight (km)</option>
+          <option value="lpg">LPG (Meals cooked)</option>
+        </select>
+        <input type="number" class="activity-value" placeholder="Enter value" />
+      `;
+      container.appendChild(newDiv);
+    }
+
+    async function calculateTotalEmission() {
+      const activityBlocks = document.querySelectorAll(".activity");
+      const resultDiv = document.getElementById("result");
+      const tipDiv = document.getElementById("tip");
+
+      let totalCO2 = 0;
+      const activityEmissions = {};
+      const feedbackTips = [];
+
+      for (const block of activityBlocks) {
+        const activity = block.querySelector(".activity-type").value;
+        const value = parseFloat(block.querySelector(".activity-value").value);
+
+        if (isNaN(value) || value <= 0) continue;
+
+        let requestData = {};
+        let unit;
+
+        if (activity === "car") {
+          requestData = {
+            emission_factor: {
+              activity_id: "passenger_vehicle-vehicle_type_other_transport_equipment-fuel_source_na-engine_size_na-vehicle_age_na-vehicle_weight_na",
+              data_version: "^0"
+            },
+            parameters: {
+              money: value,
+              money_unit: "inr"
+            }
+          };
+          unit = "car";
+        } else if (activity === "electricity") {
+          requestData = {
+            emission_factor: {
+              activity_id: "electricity-supply_grid-source_coal",
+              data_version: "^0"
+            },
+            parameters: {
+              energy: value,
+              energy_unit: "kWh"
+            }
+          };
+          unit = "electricity";
+        } else if (activity === "flight") {
+          requestData = {
+            emission_factor: {
+              activity_id: "passenger_flight-route_type_domestic-aircraft_type_jet-distance_long",
+              region: "IN",
+              year: 2023,
+              data_version: "21.21"
+            },
+            parameters: {
+              distance: value,
+              distance_unit: "km"
+            }
+          };
+          unit = "flight";
+        } else if (activity === "lpg") {
+          const kg = value * 0.25; // 0.25 kg per meal
+          requestData = {
+            emission_factor: {
+              activity_id: "fuel_type_lpg",
+              data_version: "^0"
+            },
+            parameters: {
+              fuel: kg,
+              fuel_unit: "kg"
+            }
+          };
+          unit = "lpg";
+        }
+
+        try {
+          const response = await fetch("https://api.climatiq.io/estimate", {
+            method: "POST",
+            headers: {
+              "Authorization": "Bearer N5HWV1PC3S4QB38E1J11QSPM28", // Replace with your API key
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(requestData)
+          });
+
+          if (!response.ok) continue;
+
+          const data = await response.json();
+          const co2 = data.co2e;
+
+          totalCO2 += co2;
+          activityEmissions[unit] = (activityEmissions[unit] || 0) + co2;
+
+        } catch (error) {
+          console.error("Request failed", error);
+        }
+      }
+
+      if (totalCO2 > 0) {
+        resultDiv.innerText = `🌍 Total Estimated Emissions: ${totalCO2.toFixed(2)} kg CO₂e`;
+
+        for (let [activity, emission] of Object.entries(activityEmissions)) {
+          if (emission > totalCO2 * 0.3) {
+            if (activity === "car") feedbackTips.push("🚗 High car emissions! Try carpooling or public transport.");
+            if (activity === "electricity") feedbackTips.push("💡 High electricity use! Switch to LED or solar options.");
+            if (activity === "flight") feedbackTips.push("✈️ Too much flying! Choose trains for short distances.");
+            if (activity === "lpg") feedbackTips.push("🔥 High LPG usage! Consider pressure cookers or induction.");
+          }
+        }
+
+        if (feedbackTips.length === 0) {
+          tipDiv.innerHTML = "✅ Great job! Your carbon footprint is well balanced today.";
+        } else {
+          tipDiv.innerHTML = `<strong>Suggestions:</strong><br>${feedbackTips.join("<br>")}`;
+        }
+
+      } else {
+        resultDiv.innerText = "❌ Please enter valid input values.";
+        tipDiv.innerHTML = "";
+      }
+    }
+  </script>
+  <script src="main.js"></script>
+</body>
+</html>

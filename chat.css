@@ -51,7 +51,7 @@ body{
     width: 20vw;
 }
 #message>li:nth-child(even){
-    background: red;
+    background: gray;
 }
 #message>li:nth-child(odd){
     background: #efefef;

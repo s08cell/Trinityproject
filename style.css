@@ -5,7 +5,8 @@
 }
 body{
     min-height: 100vh;
-    font-family:sans-serif
+    font-family:sans-serif;
+    scrollbar-width: none;
 }
 
 nav{
@@ -53,7 +54,7 @@ nav a:hover{
     justify-content: flex-start;
 }
 .sidebar li{
-    width: 200;
+    width: 200px;
 }#nav_icon{
     color: white;
     padding: 27px;
